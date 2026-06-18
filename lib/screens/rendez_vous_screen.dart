@@ -70,7 +70,29 @@ class _RendezVousScreenState extends State<RendezVousScreen> {
       },
     );
     if (picked != null && mounted) {
-      setState(() => _dateSelectionnee = picked);
+      final heure = await showTimePicker(
+        context: context,
+        initialTime: const TimeOfDay(hour: 8, minute: 0),
+        builder: (context, child) {
+          return Theme(
+            data: Theme.of(context).copyWith(
+              colorScheme: const ColorScheme.light(primary: navy),
+            ),
+            child: child!,
+          );
+        },
+      );
+      if (heure != null && mounted) {
+        setState(() {
+          _dateSelectionnee = DateTime(
+            picked.year,
+            picked.month,
+            picked.day,
+            heure.hour,
+            heure.minute,
+          );
+        });
+      }
     }
   }
 
@@ -79,7 +101,7 @@ class _RendezVousScreenState extends State<RendezVousScreen> {
       if (_dateSelectionnee == null) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('Veuillez choisir une date.'),
+            content: Text('Veuillez choisir une date et une heure.'),
             backgroundColor: Colors.orange,
           ),
         );
@@ -114,7 +136,7 @@ class _RendezVousScreenState extends State<RendezVousScreen> {
   Color _couleurStatut(String statut) {
     switch (statut) {
       case 'prevu':
-        return const Color(0xFF1B2A6B);
+        return navy;
       case 'termine':
         return Colors.green;
       case 'annule':
@@ -139,7 +161,7 @@ class _RendezVousScreenState extends State<RendezVousScreen> {
               child: const Icon(Icons.calendar_today, color: Colors.white, size: 18),
             ),
             title: Text(rdv.motif, style: const TextStyle(fontWeight: FontWeight.bold)),
-            subtitle: Text(DateFormat('dd MMM yyyy', 'fr').format(rdv.date)),
+            subtitle: Text(DateFormat('dd MMM yyyy à HH:mm', 'fr').format(rdv.date)),
             trailing: Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
               decoration: BoxDecoration(
@@ -195,7 +217,7 @@ class _RendezVousScreenState extends State<RendezVousScreen> {
               },
             ),
             const SizedBox(height: 24),
-            const Text('Date souhaitée',
+            const Text('Date et heure souhaitées',
                 style: TextStyle(fontWeight: FontWeight.w600)),
             const SizedBox(height: 8),
             GestureDetector(
@@ -213,8 +235,8 @@ class _RendezVousScreenState extends State<RendezVousScreen> {
                     const SizedBox(width: 12),
                     Text(
                       _dateSelectionnee == null
-                          ? 'Choisir une date (future uniquement)'
-                          : DateFormat('dd MMMM yyyy', 'fr').format(_dateSelectionnee!),
+                          ? 'Choisir une date et une heure'
+                          : DateFormat('dd MMMM yyyy à HH:mm', 'fr').format(_dateSelectionnee!),
                       style: TextStyle(
                         color: _dateSelectionnee == null ? Colors.grey : Colors.black,
                       ),

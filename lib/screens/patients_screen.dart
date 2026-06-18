@@ -3,6 +3,7 @@ import '../models/patient.dart';
 import '../models/role.dart';
 import '../services/fhir_service.dart';
 import '../widgets/carte_patient.dart';
+import 'dossier_patient_screen.dart';
 
 class PatientsScreen extends StatefulWidget {
   final Role role;
@@ -114,7 +115,10 @@ class _PatientsScreenState extends State<PatientsScreen> {
                 children: [
                   const Icon(Icons.wifi_off, size: 16, color: Colors.orange),
                   const SizedBox(width: 8),
-                  Text(_erreur!, style: const TextStyle(fontSize: 12, color: Colors.orange)),
+                  Text(
+                    _erreur!,
+                    style: const TextStyle(fontSize: 12, color: Colors.orange),
+                  ),
                 ],
               ),
             ),
@@ -128,10 +132,12 @@ class _PatientsScreenState extends State<PatientsScreen> {
                       return CartePatient(
                         patient: _patients[index],
                         onTap: () {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text('Dossier de ${_patients[index].nomComplet}'),
-                              backgroundColor: const Color(0xFF1B2A6B),
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (_) => DossierPatientScreen(
+                                patient: _patients[index],
+                                role: widget.role,
+                              ),
                             ),
                           );
                         },
