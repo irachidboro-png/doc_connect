@@ -15,8 +15,8 @@ class ConsentementDialog {
   }
 
   static Future<bool> afficherSiNecessaire(BuildContext context) async {
-    final dejaConsenti = await aDejaConsenti();
-    if (dejaConsenti) return true;
+    // Version test : le consentement est redemandé à chaque connexion,
+    // la mémorisation est désactivée pour faciliter les démonstrations.
 
     if (!context.mounted) return false;
 
