@@ -2,15 +2,19 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../models/rendez_vous.dart';
 import '../models/role.dart';
+import '../models/patient.dart';
+import 'dossier_patient_screen.dart';
 
 class DetailsRdvScreen extends StatelessWidget {
   final RendezVous rdv;
   final Role role;
+  final Patient? patient;
 
   const DetailsRdvScreen({
     super.key,
     required this.rdv,
     required this.role,
+    this.patient,
   });
 
   static const navy = Color(0xFF1B2A6B);
@@ -44,6 +48,8 @@ class DetailsRdvScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final estMedecinAvecPatient = role == Role.medecin && patient != null;
+
     return Scaffold(
       backgroundColor: const Color(0xFFF5F6FA),
       appBar: AppBar(
@@ -90,6 +96,8 @@ class DetailsRdvScreen extends StatelessWidget {
                     style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: navy),
                   ),
                   const SizedBox(height: 16),
+                  if (estMedecinAvecPatient)
+                    _ligneInfo(Icons.person, 'Patient', patient!.nomComplet),
                   _ligneInfo(Icons.medical_information, 'Motif', rdv.motif),
                   _ligneInfo(
                     Icons.calendar_today,
@@ -98,7 +106,29 @@ class DetailsRdvScreen extends StatelessWidget {
                   ),
                   _ligneInfo(Icons.local_hospital, 'Médecin', rdv.medecin),
                   _ligneInfo(Icons.flag, 'Statut', _libelleStatut(rdv.statut)),
-                  const SizedBox(height: 32),
+                  const SizedBox(height: 24),
+                  if (estMedecinAvecPatient) ...[
+                    SizedBox(
+                      width: double.infinity,
+                      height: 50,
+                      child: OutlinedButton.icon(
+                        onPressed: () {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (_) => DossierPatientScreen(patient: patient!, role: role),
+                            ),
+                          );
+                        },
+                        icon: const Icon(Icons.folder_shared, color: navy),
+                        label: const Text('Voir le dossier du patient', style: TextStyle(color: navy)),
+                        style: OutlinedButton.styleFrom(
+                          side: const BorderSide(color: navy),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                  ],
                   if (role == Role.medecin) ...[
                     SizedBox(
                       width: double.infinity,

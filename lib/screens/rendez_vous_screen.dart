@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../models/role.dart';
 import '../models/rendez_vous.dart';
+import '../models/patient.dart';
 import 'details_rdv_screen.dart';
+import 'nouveau_rdv_medecin_screen.dart';
 
 class RendezVousScreen extends StatefulWidget {
   final Role role;
@@ -20,6 +22,30 @@ class _RendezVousScreenState extends State<RendezVousScreen> {
 
   static const navy = Color(0xFF1B2A6B);
   static const teal = Color(0xFF1ABC9C);
+
+  final Map<String, Patient> _patientsParId = {
+    '1': Patient(
+      id: '1',
+      nom: 'Ouédraogo',
+      prenom: 'Aminata',
+      dateNaissance: DateTime(1990, 3, 15),
+      telephone: '+226 70 11 22 33',
+    ),
+    '2': Patient(
+      id: '2',
+      nom: 'Compaoré',
+      prenom: 'Mariam',
+      dateNaissance: DateTime(1985, 7, 22),
+      telephone: '+226 76 44 55 66',
+    ),
+    '3': Patient(
+      id: '3',
+      nom: 'Traoré',
+      prenom: 'Ibrahim',
+      dateNaissance: DateTime(1978, 11, 8),
+      telephone: '+226 65 77 88 99',
+    ),
+  };
 
   final List<RendezVous> _rendezVous = [
     RendezVous(
@@ -170,9 +196,15 @@ class _RendezVousScreenState extends State<RendezVousScreen> {
           ),
         ),
         onTap: () {
+          final patientConcerne =
+              widget.role == Role.medecin ? _patientsParId[rdv.patientId] : null;
           Navigator.of(context).push(
             MaterialPageRoute(
-              builder: (_) => DetailsRdvScreen(rdv: rdv, role: widget.role),
+              builder: (_) => DetailsRdvScreen(
+                rdv: rdv,
+                role: widget.role,
+                patient: patientConcerne,
+              ),
             ),
           );
         },
@@ -317,6 +349,28 @@ class _RendezVousScreenState extends State<RendezVousScreen> {
       body: widget.role == Role.medecin
           ? _vueListeMedecin()
           : _vuePatient(),
+      floatingActionButton: widget.role == Role.medecin
+          ? FloatingActionButton(
+              backgroundColor: teal,
+              onPressed: () async {
+                final nouveauRdv = await Navigator.of(context).push<RendezVous>(
+                  MaterialPageRoute(
+                    builder: (_) => NouveauRdvMedecinScreen(patients: _patientsParId),
+                  ),
+                );
+                if (nouveauRdv != null && mounted) {
+                  setState(() => _rendezVous.add(nouveauRdv));
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Rendez-vous créé !'),
+                      backgroundColor: Colors.green,
+                    ),
+                  );
+                }
+              },
+              child: const Icon(Icons.add, color: Colors.white),
+            )
+          : null,
     );
   }
 }
